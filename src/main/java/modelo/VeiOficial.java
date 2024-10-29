@@ -8,8 +8,13 @@ package modelo;
  *
  * @author pedro
  */
+@Entity
+@Table(name = "tb_veioficial")
 public class VeiOficial extends Veiculo{
+    @Column(name = "renavan", length = 11, nullable = false)
     private String renavan;
+    
+    @Column(name = "chassi", length = 20, nullable = false)
     private String chassi;
     
     public String getRenavan() {

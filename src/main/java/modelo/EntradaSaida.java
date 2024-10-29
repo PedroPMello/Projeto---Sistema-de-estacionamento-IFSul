@@ -10,11 +10,19 @@ import java.util.Date;
  *
  * @author pedro
  */
+@Entity
+@Table(name = "tb_entradasaida")
 public class EntradaSaida {
+     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id
     private int id;
+     
+    @Column(nullable = false, length = 8)
     private Date data;
     
+    @Enumerated(EnumType.STRING)
     private TipoMovimentacao tipoMovimentacao;
+    
     
     private final Veiculo veiculo;
 

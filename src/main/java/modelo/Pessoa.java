@@ -11,11 +11,23 @@ import java.util.List;
  *
  * @author pedro
  */
+@Entity
+@Table(name = "tb_pessoa")
 public class Pessoa {
-private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id
+    private int id;
+    
+    @Column(name = "nome", length = 50, nullable = false)
     private String nome;
+    
+    @Column(name = "fone", length = 20, nullable = false)
     private String fone;
+    
+    @Column(name = "email", length = 30, nullable = false)
     private String email;
+    
+    @Enumerated(EnumType.STRING)
     private VinculoPessoa vinculoPessoa;
     
     private List<Veiculo> listaVeiculos;
