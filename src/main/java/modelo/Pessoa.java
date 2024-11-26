@@ -7,6 +7,7 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -92,5 +93,10 @@ public class Pessoa {
 
     public List<Veiculo> getListaVeiculos() {
         return listaVeiculos;
+    }
+    
+    @Override
+    public String toString() {
+        return nome+" ("+vinculoPessoa+")";
     }
 }

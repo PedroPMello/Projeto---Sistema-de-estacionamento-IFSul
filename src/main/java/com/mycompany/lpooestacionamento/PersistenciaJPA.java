@@ -4,8 +4,6 @@
  */
 package com.mycompany.lpooestacionamento;
 
-import java.util.ArrayList;
-import modelo.Pessoa;
 
 /**
  *
@@ -18,12 +16,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import modelo.Pessoa;
 import modelo.VinculoPessoa;
 
-/**
- *
- * @author vanessalagomachado
- */
 public class PersistenciaJPA implements InterfaceBD {
 
     EntityManager entity;
@@ -37,24 +32,30 @@ public class PersistenciaJPA implements InterfaceBD {
         entity = factory.createEntityManager();
     }
 
+    @Override
     public Boolean conexaoAberta() {
 
         return entity.isOpen();
     }
 
+    @Override
     public void fecharConexao() {
         entity.close();
     }
 
+    @Override
     public Object find(Class c, Object id) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-
+    @Override
     public void persist(Object o) throws Exception {
         entity = getEntityManager();
         try {
             entity.getTransaction().begin();
+            if (!entity.contains(o)) {
+                o = entity.merge(o); // Anexa o objeto ao contexto de persistência, se necessário
+            }
             entity.persist(o);
             entity.getTransaction().commit();
         } catch (Exception e) {
@@ -69,9 +70,13 @@ public class PersistenciaJPA implements InterfaceBD {
         entity = getEntityManager();
         try {
             entity.getTransaction().begin();
+            if (!entity.contains(o)) {
+                o = entity.merge(o); // Anexa o objeto ao contexto de persistência, se necessário
+            }
             entity.remove(o);
             entity.getTransaction().commit();
         } catch (Exception e) {
+            System.err.println("Erro ao remover item: "+e);
             if (entity.getTransaction().isActive()) {
                 entity.getTransaction().rollback();
             }
@@ -104,18 +109,37 @@ public class PersistenciaJPA implements InterfaceBD {
         }
 
     }
+
     
-    public List<Pessoa> buscarPessoasPorNome(String nome) {
-    return entity.createQuery("SELECT p FROM Pessoa p WHERE p.nome LIKE :nome", Pessoa.class)
-             .setParameter("nome", "%" + nome + "%")
-             .getResultList();
-}
+    public List<Pessoa> getPessoas(VinculoPessoa vinculoSelecionado) {
+        entity = getEntityManager();
 
-public List<Pessoa> buscarPessoasPorNomeEVinculo(String nome, VinculoPessoa vinculo) {
-    return entity.createQuery("SELECT p FROM Pessoa p WHERE p.nome LIKE :nome AND p.vinculo = :vinculo", Pessoa.class)
-             .setParameter("nome", "%" + nome + "%")
-             .setParameter("vinculo", vinculo)
-             .getResultList();
-}
+        try {
+            TypedQuery<Pessoa> query
+                    = entity.createQuery("Select p from Pessoa p where p.vinculoPessoa = '"
+                            +vinculoSelecionado+"'", 
+                            Pessoa.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar Pessoas: " + e);
+            return null;
+        }
 
+    }
+    
+    public List<Pessoa> getPessoas(String nome) {
+        entity = getEntityManager();
+
+        try {
+            TypedQuery<Pessoa> query
+                    = entity.createQuery("Select p from Pessoa p where lower(p.nome) LIKE :n", 
+                            Pessoa.class);
+            query.setParameter("n", "%"+nome.toLowerCase()+"%");
+            return query.getResultList();
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar Pessoas: " + e);
+            return null;
+        }
+
+    }   
 }
